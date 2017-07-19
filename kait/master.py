@@ -8,8 +8,11 @@ app = Flask(__name__)
 config.autoload()
 broker = RabbitMQ(config.amqp_url, config.amqp_exchange)
 
-@app.route(u'/hooks/<source_name>')
+@app.route(u'/hooks/<source_name>', methods=['POST'])
 def hooks(source_name):
+    if config.token and config.token != request.args.get('token'):
+        return make_response(u"invalid token", 400)
+
     try:
         source = __import__(u"kait.sources."+source_name, fromlist=[''])
     except ImportError as e:
