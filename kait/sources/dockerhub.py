@@ -8,6 +8,7 @@ def create_payload(raw_data, content_type="application/json"):
     repo_name = data["repository"]["repo_name"]
     tag = data["push_data"]["tag"]
     timestamp = data["push_data"]["pushed_at"]
+    pusher = data["push_data"]["pusher"]
     image = "{repo_name}:{tag}".format(**locals())
 
     group = repo_name.replace('/', '.')
