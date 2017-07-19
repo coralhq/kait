@@ -8,20 +8,21 @@ app = Flask(__name__)
 config.autoload()
 broker = RabbitMQ(config.amqp_url, config.amqp_exchange)
 
-@app.route(u'/hooks/<plugin_name>')
-def hooks(plugin_name):
+@app.route(u'/hooks/<source_name>')
+def hooks(source_name):
     try:
-        plugin = __import__(u"kait.plugins."+plugin_name, fromlist=[''])
+        source = __import__(u"kait.sources."+source_name, fromlist=[''])
     except ImportError as e:
-        return make_response(u"Plugin not found: "+plugin_name, 404)
+        return make_response(u"source not found: "+source_name, 404)
 
-    payload = plugin.create_payload(request.data)
-    payload[u"_plugin_name"] = plugin_name
+    payload = source.create_payload(request.data)
+    payload[u"_source_name"] = source_name
     group = payload[u"_group"]
 
     try:
-        print(u"publishing to: %s.%s" % (plugin_name, group))
-        broker.publish(plugin_name, group, dumps(payload))
+        body = dumps(payload)
+        print(u"%s.%s: %s" % (source_name, group, body))
+        broker.publish(source_name, group, body)
         return u"OK"
     except Exception as e:
         return str(e)

@@ -3,8 +3,8 @@ from kait.broker import RabbitMQ
 from sys import argv
 from simplejson import loads
 
-def run(plugin_name, callback):
-    print("subscribing to " + plugin_name)
+def run(source_name, callback):
+    print("subscribing to " + source_name)
 
     def cb(channel, method, properties, body):
         callback(loads(body))
@@ -14,5 +14,5 @@ def run(plugin_name, callback):
 
     broker = RabbitMQ(config.amqp_url, config.amqp_exchange)
     broker.connect()
-    broker.subscribe(plugin_name, cb)
+    broker.subscribe(source_name, cb)
     broker.disconnect()

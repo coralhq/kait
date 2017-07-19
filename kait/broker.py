@@ -13,18 +13,18 @@ class RabbitMQ(object):
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange=self.exchange, type='topic', durable=True)
 
-    def publish(self, plugin_name, group, body):
-        routing_key = u"%s.%s" % (plugin_name, group)
-        self.channel.queue_declare(queue=plugin_name, durable=True)
+    def publish(self, source_name, group, body):
+        routing_key = u"%s.%s" % (source_name, group)
+        self.channel.queue_declare(queue=source_name, durable=True)
         self.channel.basic_publish(exchange=self.exchange, routing_key=routing_key, body=body)
 
-    def subscribe(self, plugin_name, callback):
-        self.channel.queue_declare(queue=plugin_name, durable=True)
+    def subscribe(self, source_name, callback):
+        self.channel.queue_declare(queue=source_name, durable=True)
         self.channel.queue_bind(exchange=self.exchange,
-                       queue=plugin_name,
-                       routing_key=plugin_name+'.#')
+                       queue=source_name,
+                       routing_key=source_name+'.#')
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(callback, queue=plugin_name)
+        self.channel.basic_consume(callback, queue=source_name)
         self.channel.start_consuming()
 
     def disconnect(self):

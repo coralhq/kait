@@ -1,6 +1,6 @@
 from simplejson import loads
 
-PLUGIN_NAME = "dockerhub"
+SOURCE_NAME = "dockerhub"
 
 def create_payload(raw_data, content_type="application/json"):
     data = loads(raw_data)
