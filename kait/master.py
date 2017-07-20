@@ -25,12 +25,12 @@ def hooks(source_name):
     try:
         body = dumps(payload)
         print(u"%s.%s: %s" % (source_name, group, body))
+        broker.connect()
         broker.publish(source_name, group, body)
+        broker.disconnect()
         return u"OK"
     except Exception as e:
         return str(e)
 
 def run():
-    broker.connect()
     app.run(host='0.0.0.0', port=8080, debug=config.debug)
-    broker.disconnect()
